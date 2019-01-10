@@ -31,4 +31,4 @@ RUN cd .. && \
     python3 setup.py install
 
 CMD cd numpy && \
-    python3 runtests.py --show-build-log -t "numpy/linalg/tests/test_linalg.py"
+    python3 runtests.py --mode=full --show-build-log -t "numpy/linalg/tests/test_linalg.py::TestPinv"
