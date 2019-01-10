@@ -28,7 +28,8 @@ RUN cd .. && \
     cd numpy && \
     NUMPY_EXPERIMENTAL_ARRAY_FUNCTION=1 \
     F77=gfortran-5 F90=gfortran-5 \
-    python3 setup.py install
+    CFLAGS='-UNDEBUG -std=c99' python3 setup.py install
 
 CMD cd numpy && \
+    CFLAGS='-UNDEBUG -std=c99' \
     python3 runtests.py --mode=full --show-build-log -t "numpy/linalg/tests/test_linalg.py::TestPinv"
