@@ -1,6 +1,7 @@
 FROM i386/ubuntu:bionic
 
 RUN apt-get update && apt-get install -y \
+  gcc-4.9 \
   gfortran-5 \
   git \
   locales \
@@ -15,7 +16,8 @@ RUN pip3 install \
     cython==0.29.0 \
     pytest \
     pytz \
-    pickle5
+    pickle5 \
+    wheel
 
 RUN cd .. && \
     mkdir openblas && cd openblas && \
@@ -24,12 +26,16 @@ RUN cd .. && \
     cp -r ./usr/local/lib/* /usr/lib && \
     cp ./usr/local/include/* /usr/include && \
     cd .. && \
-    git clone https://github.com/numpy/numpy.git && \
-    cd numpy && \
-    NUMPY_EXPERIMENTAL_ARRAY_FUNCTION=1 \
+    git clone https://github.com/numpy/numpy.git
+
+RUN cd numpy && \
     F77=gfortran-5 F90=gfortran-5 \
-    CFLAGS='-UNDEBUG -std=c99' python3 setup.py install
+    CC=/usr/bin/gcc-5 CFLAGS='-UNDEBUG -std=c99' pip3 wheel -v -v -v --wheel-dir=./dist .
+
+RUN cd numpy/dist && \
+    F77=gfortran-5 F90=gfortran-5 CC=/usr/bin/gcc-5 CFLAGS='-UNDEBUG -std=c99' \
+    pip3 install ./numpy*i686.whl
 
 CMD cd numpy && \
-    CFLAGS='-UNDEBUG -std=c99' \
-    python3 runtests.py --mode=full --show-build-log -t "numpy/linalg/tests/test_linalg.py::TestPinv"
+    python3 runtests.py -n --mode=full -- -k "TestPinv" && \
+    /usr/bin/gcc-5 --version
