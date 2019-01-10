@@ -36,4 +36,4 @@ RUN cd numpy/dist && \
     pip3 install ./numpy*i686.whl
 
 CMD cd numpy && \
-    python3 runtests.py -n --mode=full -- -k "TestPinv"
+    python3 runtests.py -v -n --mode=full -- -k "TestPinv"
