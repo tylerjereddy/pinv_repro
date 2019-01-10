@@ -1,22 +1,22 @@
-FROM i386/ubuntu:bionic
+FROM i386/ubuntu:xenial
 
 RUN apt-get update && apt-get install -y \
   gcc-4.9 \
-  gfortran-5 \
+  gfortran-4.9 \
   git \
   locales \
-  python3.6-dev \
+  python3.5-dev \
   python3-pip \
   wget
 
 RUN locale-gen fr_FR && update-locale
-RUN pip3 install \
+RUN pip3 install --upgrade \
+    pip \
     setuptools \
     nose \
     cython==0.29.0 \
     pytest \
     pytz \
-    pickle5 \
     wheel
 
 RUN cd .. && \
@@ -29,13 +29,11 @@ RUN cd .. && \
     git clone https://github.com/numpy/numpy.git
 
 RUN cd numpy && \
-    F77=gfortran-5 F90=gfortran-5 \
-    CC=/usr/bin/gcc-5 CFLAGS='-UNDEBUG -std=c99' pip3 wheel -v -v -v --wheel-dir=./dist .
+    F77=gfortran-4.9 F90=gfortran-4.9 \
+    CC=/usr/bin/gcc-4.9 CFLAGS='-UNDEBUG -std=c99' pip3 wheel -v -v -v --wheel-dir=./dist .
 
 RUN cd numpy/dist && \
-    F77=gfortran-5 F90=gfortran-5 CC=/usr/bin/gcc-5 CFLAGS='-UNDEBUG -std=c99' \
     pip3 install ./numpy*i686.whl
 
 CMD cd numpy && \
-    python3 runtests.py -n --mode=full -- -k "TestPinv" && \
-    /usr/bin/gcc-5 --version
+    python3 runtests.py -n --mode=full -- -k "TestPinv"
